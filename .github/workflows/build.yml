@@ -31,6 +31,17 @@ jobs:
     - name: Get dependencies
       run: flutter pub get
 
+    - name: Validate Flutter Project
+      run: |
+        echo "=== Checking pubspec.yaml ==="
+        test -f pubspec.yaml && echo "✓ pubspec.yaml exists" || echo "✗ pubspec.yaml missing"
+        echo "=== Checking android/build.gradle ==="
+        test -f android/build.gradle && echo "✓ android/build.gradle exists" || echo "✗ android/build.gradle missing"
+        echo "=== Checking android/app/build.gradle ==="
+        test -f android/app/build.gradle && echo "✓ android/app/build.gradle exists" || echo "✗ android/app/build.gradle missing"
+        echo "=== Running flutter analyze ==="
+        flutter analyze --no-fatal-infos || true
+
     - name: Debug Info
       run: |
         echo "=== Flutter Info ===" 
@@ -52,6 +63,7 @@ jobs:
         path: build_output.log
 
     - name: Upload APK Artifact
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: release-apk

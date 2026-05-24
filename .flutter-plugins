@@ -1,0 +1,7 @@
+# This file tracks properties of this Flutter project.
+# Used by Flutter tooling to track usability of various aspects of the
+# plugins and packages named below.
+# For more information, see https://flutter.dev/to/plugin-dependencies
+
+permission_handler=/root/.pub-cache/hosted/pub.dartlang.org/permission_handler-11.4.4/
+http=/root/.pub-cache/hosted/pub.dartlang.org/http-1.1.0/
