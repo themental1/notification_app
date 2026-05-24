@@ -1,13 +1,11 @@
+include ":app"
+
 pluginManagement {
     repositories {
         google()
         mavenCentral()
         gradlePluginPortal()
     }
-}
-
-plugins {
-    id "dev.flutter.flutter-gradle-plugin" version "1.0.0" apply false
 }
 
 dependencyResolutionManagement {
@@ -17,5 +15,3 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
-include ":app"
