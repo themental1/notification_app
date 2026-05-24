@@ -61,19 +61,11 @@ die () {
 }
 
 # OS specific support (must be 'true' or 'false').
-cygwin=false
-msys=false
 darwin=false
 nonstop=false
 case "`uname`" in
-  CYGWIN* )
-    cygwin=true
-    ;;
   Darwin* )
     darwin=true
-    ;;
-  MSYS* | MINGW* )
-    msys=true
     ;;
   NONSTOP* )
     nonstop=true
@@ -105,7 +97,7 @@ location of your Java installation."
 fi
 
 # Increase the maximum file descriptors if we can.
-if [ "$cygwin" = "false" -a "$darwin" = "false" -a "$nonstop" = "false" ] ; then
+if [ "$darwin" = "false" -a "$nonstop" = "false" ] ; then
     MAX_FD_LIMIT=`ulimit -H -n`
     if [ $? -eq 0 ] ; then
         if [ "$MAX_FD" = "maximum" -o "$MAX_FD" = "max" ] ; then
@@ -125,21 +117,6 @@ if $darwin; then
     GRADLE_OPTS="$GRADLE_OPTS \"-Xdock:name=$APP_NAME\" \"-Xdock:icon=$APP_HOME/media/gradle.icns\""
 fi
 
-# For Cygwin or MSYS, switch paths to Windows format before running java
-if [ "$cygwin" = "true" -o "$msys" = "true" ] ; then
-    APP_HOME=`cygpath --path --mixed "$APP_HOME"`
-    CLASSPATH=`cygpath --path --mixed "$CLASSPATH"`
-    JAVACMD=`cygpath --mixed "$JAVACMD"`
-
-    # We build the pattern for arguments to be converted via cygpath
-    ROOTDIRSRAW=`find -L / -maxdepth 3 -type d -name "gradle-wrapper.jar" 2>/dev/null | head -n 1`
-    [ -z "$ROOTDIRSRAW" ] && ROOTDIRSRAW=`find -L / -maxdepth 3 -type f -name "gradle-wrapper.jar" 2>/dev/null | head -n 1`
-fi
-
-# Escape application home to make it safe to pass as argument to Java
-APP_HOME_ESCAPED=`cygpath --path --mixed "$APP_HOME"`
-CLASSPATH_ESCAPED=`cygpath --path --mixed "$CLASSPATH"`
-
 # Collect all arguments for the java command, stacking in reverse order:
 #    * args from the command line
 #    * the main class name
@@ -147,13 +124,6 @@ CLASSPATH_ESCAPED=`cygpath --path --mixed "$CLASSPATH"`
 #    * -D...appname settings
 #    * --module-path (only if needed)
 #    * DEFAULT_JVM_OPTS, JAVA_OPTS, and GRADLE_OPTS environment variables.
-
-# For Cygwin or MSYS, switch paths to Windows format before running java
-if [ "$cygwin" = "true" -o "$msys" = "true" ] ; then
-    APP_HOME=`cygpath --path --mixed "$APP_HOME"`
-    CLASSPATH=`cygpath --path --mixed "$CLASSPATH"`
-    JAVACMD=`cygpath --mixed "$JAVACMD"`
-fi
 
 # Start the Gradle daemon
 eval "$JAVACMD" $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS \
