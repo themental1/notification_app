@@ -1,0 +1,27 @@
+.DS_Store
+*.jks
+*.keystore
+build/
+.gradle/
+*.local
+
+# Flutter
+.packages
+.dart_tool/
+build/
+ios/
+web/
+windows/
+linux/
+macos/
+
+# Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+local.properties
+
+# Environment
+.env
+.env.local
