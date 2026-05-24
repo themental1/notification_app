@@ -31,6 +31,15 @@ jobs:
     - name: Get dependencies
       run: flutter pub get
 
+    - name: Debug Info
+      run: |
+        echo "=== Flutter Info ===" 
+        flutter doctor -v
+        echo "=== Gradle Version ===" 
+        cd android && ./gradlew --version || gradle --version
+        echo "=== Kotlin Compiler ===" 
+        kotlinc -version || true
+
     - name: Build APK
       run: flutter build apk --release -v
 
