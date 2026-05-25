@@ -28,6 +28,14 @@ jobs:
         channel: 'stable'
         cache: true
 
+    - name: Create fresh Flutter project
+      run: |
+        flutter create --org com.themental1 --project-name notification_app /tmp/fresh_app
+        rm -rf android
+        cp -r /tmp/fresh_app/android .
+        cp -r lib/. /tmp/fresh_app/lib/
+        cp pubspec.yaml /tmp/fresh_app/pubspec.yaml
+
     - name: Get dependencies
       run: flutter pub get
 
