@@ -28,13 +28,43 @@ jobs:
         channel: 'stable'
         cache: true
 
-    - name: Create fresh Flutter project
+    - name: Preserve custom android files (if they exist)
+      run: |
+        if [ -d "android" ]; then
+          mkdir -p /tmp/custom_android_backup
+          if [ -d "android/app/src/main/kotlin" ]; then
+            cp -r android/app/src/main/kotlin /tmp/custom_android_backup/
+          fi
+          if [ -f "android/app/src/main/AndroidManifest.xml" ]; then
+            cp android/app/src/main/AndroidManifest.xml /tmp/custom_android_backup/
+          fi
+          if [ -f "android/app/build.gradle" ]; then
+            cp android/app/build.gradle /tmp/custom_android_backup/
+          fi
+        fi
+
+    - name: Create fresh Flutter project (for base android structure only)
       run: |
         flutter create --org com.themental1 --project-name notification_app /tmp/fresh_app
-        rm -rf android
-        cp -r /tmp/fresh_app/android .
+        if [ ! -d "android" ]; then
+          cp -r /tmp/fresh_app/android .
+        fi
         cp -r lib/. /tmp/fresh_app/lib/
         cp pubspec.yaml /tmp/fresh_app/pubspec.yaml
+
+    - name: Restore custom android files
+      run: |
+        if [ -d "/tmp/custom_android_backup" ]; then
+          if [ -d "/tmp/custom_android_backup/kotlin" ]; then
+            cp -r /tmp/custom_android_backup/kotlin/* android/app/src/main/kotlin/ 2>/dev/null || true
+          fi
+          if [ -f "/tmp/custom_android_backup/AndroidManifest.xml" ]; then
+            cp /tmp/custom_android_backup/AndroidManifest.xml android/app/src/main/
+          fi
+          if [ -f "/tmp/custom_android_backup/build.gradle" ]; then
+            cp /tmp/custom_android_backup/build.gradle android/app/
+          fi
+        fi
 
     - name: Get dependencies
       run: flutter pub get
