@@ -23,7 +23,7 @@
         </activity>
 
         <service
-            android:name=".NotificationListenerService"
+            android:name=".NotificationListener"
             android:label="Notification Logger"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
             android:exported="true">

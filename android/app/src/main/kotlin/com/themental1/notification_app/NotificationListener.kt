@@ -12,7 +12,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import org.json.JSONObject
 
-class NotificationListenerService : NotificationListenerService() {
+class NotificationListener : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         val notification = sbn.notification
         val extras = notification.extras
