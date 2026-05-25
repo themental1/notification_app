@@ -1,7 +1,6 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
 }
 
 def localProperties = new Properties()
@@ -23,7 +22,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "gr.ornette.notification_app"
+    namespace = "com.themental1.notification_app"
     compileSdk = 34
 
     compileOptions {
@@ -36,8 +35,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "gr.ornette.notification_app"
-        minSdk = 21
+        applicationId = "com.themental1.notification_app"
+        minSdk = 26
         targetSdk = 34
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
