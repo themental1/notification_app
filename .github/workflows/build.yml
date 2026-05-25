@@ -52,24 +52,18 @@ jobs:
         kotlinc -version || true
 
     - name: Build APK
-      run: flutter build apk --release -v 2>&1 | tee build_output.log
+      run: flutter build apk --release --verbose 2>&1 | tee build-output.log; exit ${PIPESTATUS[0]}
 
     - name: Check APK Output
       if: always()
-      run: |
-        echo "=== Checking for APK files ==="
-        find . -name "*.apk" -type f 2>/dev/null | head -20 || echo "No APK files found"
-        echo "=== Gradle build outputs directory ==="
-        ls -la build/app/outputs/ 2>/dev/null || echo "outputs directory not found"
-        ls -la build/app/outputs/apk/ 2>/dev/null || echo "apk directory not found"
-        ls -la build/app/outputs/apk/release/ 2>/dev/null || echo "apk/release directory not found"
+      run: find build/app/outputs -name "*.apk" 2>/dev/null || echo "No APK found"
 
     - name: Upload Build Log
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: build-log
-        path: build_output.log
+        path: build-output.log
 
     - name: Upload APK Artifact
       if: success()
