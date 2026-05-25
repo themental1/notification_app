@@ -37,7 +37,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    _urlController.text = 'http://10.0.10.11:8000/api/notifications';
+    _urlController.text = 'http://10.0.10.125:8082/log';
   }
 
   @override
@@ -64,17 +64,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () {
+              onPressed: () async {
                 setState(() {
                   _isListening = !_isListening;
                 });
                 if (_isListening) {
-                  NotificationService.startListening(_urlController.text);
+                  await NotificationService.startListening(_urlController.text);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Listening for notifications')),
                   );
                 } else {
-                  NotificationService.stopListening();
+                  await NotificationService.stopListening();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Stopped listening')),
                   );
