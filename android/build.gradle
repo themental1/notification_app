@@ -1,7 +1,3 @@
-buildscript {
-    ext.kotlin_version = '1.8.0'
-}
-
 allprojects {
     repositories {
         google()
@@ -9,12 +5,17 @@ allprojects {
     }
 }
 
+rootProject.buildDir = '../build'
 subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty("android")) {
-            android {
-                compileSdkVersion = 34
-            }
-        }
-    }
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+subprojects {
+    project.evaluationDeps = function() { }
+}
+
+def flutterRoot = rootProject.projectDir.parentFile.parentFile
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }

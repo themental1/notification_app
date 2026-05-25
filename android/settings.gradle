@@ -1,23 +1,30 @@
 pluginManagement {
+    def flutterSdkPath = {
+        def properties = new Properties()
+        def localPropertiesFile = new File(rootDir.absolutePath + "/local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.withInputStream { properties.load(it) }
+        }
+        def flutterSdkPathString = properties.getProperty("flutter.sdk")
+        if (flutterSdkPathString == null) {
+            throw new GradleException("flutter.sdk not set in local.properties")
+        }
+        return flutterSdkPathString
+    }
+    settings.ext.flutterSdkPath = flutterSdkPath()
+
     repositories {
         google()
         mavenCentral()
         gradlePluginPortal()
     }
-    plugins {
-        id "com.android.application" version "8.1.0"
-        id "com.android.library" version "8.1.0"
-        id "org.jetbrains.kotlin.android" version "1.8.0"
-    }
 }
 
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
-    repositories {
-        google()
-        mavenCentral()
-    }
+plugins {
+    id "dev.flutter.flutter-gradle-plugin" version "1.0.0" apply false
 }
 
-rootProject.name = "notification_app"
 include ':app'
+
+def flutterProjectRoot = rootProject.projectDir.parentFile.parentFile
+assert flutterProjectRoot.isDirectory()
