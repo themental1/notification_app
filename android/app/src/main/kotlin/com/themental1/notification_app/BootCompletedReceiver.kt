@@ -1,4 +1,4 @@
-package gr.ornette.notification_app
+package com.themental1.notification_app
 
 import android.content.BroadcastReceiver
 import android.content.Context
