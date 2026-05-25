@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import io.flutter.embedding.engine.FlutterEngine
@@ -24,11 +25,16 @@ class NotificationListener : NotificationListenerService() {
         val tag = sbn.tag
         val priority = notification.priority
 
+        // Get device info
+        val deviceId = getDeviceId()
+        val deviceName = getDeviceName()
+
         val prefs = getSharedPreferences("notification_config", Context.MODE_PRIVATE)
         val webhookUrl = prefs.getString("webhook_url", "http://10.0.10.125:8082/log")
         
         android.util.Log.d("NotificationListener", "onNotificationPosted called for: $packageName")
         android.util.Log.d("NotificationListener", "webhook_url from SharedPreferences: '$webhookUrl'")
+        android.util.Log.d("NotificationListener", "device_id: $deviceId, device_name: $deviceName")
         
         if (webhookUrl.isNullOrEmpty()) {
             android.util.Log.w("NotificationListener", "webhook_url is null or empty, ignoring notification")
@@ -44,7 +50,9 @@ class NotificationListener : NotificationListenerService() {
                 text,
                 subText,
                 tag,
-                priority
+                priority,
+                deviceId,
+                deviceName
             )
         }.start()
     }
@@ -60,7 +68,9 @@ class NotificationListener : NotificationListenerService() {
         text: String,
         subText: String?,
         tag: String?,
-        priority: Int
+        priority: Int,
+        deviceId: String,
+        deviceName: String
     ) {
         try {
             android.util.Log.d("NotificationListener", "sendToWebhook called with URL: $url")
@@ -80,7 +90,9 @@ class NotificationListener : NotificationListenerService() {
                 put("subText", subText)
                 put("tag", tag)
                 put("priority", priority)
-                put("timestamp", System.currentTimeMillis())
+                put("device_id", deviceId)
+                put("device_name", deviceName)
+                put("timestamp", java.time.Instant.now().toString())
             }
 
             android.util.Log.d("NotificationListener", "Sending payload: ${payload.toString()}")
@@ -100,6 +112,28 @@ class NotificationListener : NotificationListenerService() {
             connection.disconnect()
         } catch (e: Exception) {
             android.util.Log.e("NotificationListener", "Error sending webhook: ${e.message}", e)
+        }
+    }
+
+    // Helper function to get unique device identifier
+    private fun getDeviceId(): String {
+        return try {
+            Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID) ?: "unknown"
+        } catch (e: Exception) {
+            android.util.Log.e("NotificationListener", "Error getting device ID: ${e.message}")
+            "unknown"
+        }
+    }
+
+    // Helper function to get friendly device name
+    private fun getDeviceName(): String {
+        return try {
+            val manufacturer = Build.MANUFACTURER.replaceFirstChar { it.uppercase() }
+            val model = Build.MODEL
+            "$manufacturer $model"
+        } catch (e: Exception) {
+            android.util.Log.e("NotificationListener", "Error getting device name: ${e.message}")
+            "Unknown Device"
         }
     }
 }
