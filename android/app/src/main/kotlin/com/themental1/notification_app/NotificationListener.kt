@@ -19,11 +19,22 @@ class NotificationListener : NotificationListenerService() {
         val extras = notification.extras
 
         val packageName = sbn.packageName
-        val title = extras.getString("android.title") ?: ""
+        // Use getCharSequence for both title and text to handle SpannableString properly
+        val title = extras.getCharSequence("android.title")?.toString() ?: ""
         val text = extras.getCharSequence("android.text")?.toString() ?: ""
         val subText = extras.getCharSequence("android.subText")?.toString()
         val tag = sbn.tag
         val priority = notification.priority
+        
+        // Detect if this is an outgoing message (user-sent notification)
+        val isOutgoing = detectOutgoingMessage(extras, packageName, text)
+        
+        // Log outgoing messages separately
+        if (isOutgoing) {
+            android.util.Log.i("NotificationListener", "OUTGOING: [$packageName] $title - $text")
+        } else {
+            android.util.Log.d("NotificationListener", "INCOMING: [$packageName] $title - $text")
+        }
 
         // Get device info
         val deviceId = getDeviceId()
@@ -52,9 +63,49 @@ class NotificationListener : NotificationListenerService() {
                 tag,
                 priority,
                 deviceId,
-                deviceName
+                deviceName,
+                isOutgoing
             )
         }.start()
+    }
+
+    private fun detectOutgoingMessage(extras: android.os.Bundle, packageName: String, text: String): Boolean {
+        // Check for messaging app category indicators
+        val category = extras.getString("android.category") ?: ""
+        if (category == "msg") {
+            return true
+        }
+        
+        // Check for text style indicators (user reply, composer, etc.)
+        if (extras.get("android.text.style") != null) {
+            return true
+        }
+        
+        // Check for messaging action flags that indicate outgoing
+        val actions = extras.get("android.actions") as? android.os.Parcelable
+        if (actions != null) {
+            return true
+        }
+        
+        // App-specific heuristics for common messaging apps
+        val commonMessagingApps = mapOf(
+            "com.whatsapp" to listOf("You", "Reply"),
+            "com.telegram" to listOf("Sent", "Edit message"),
+            "com.viber.voip" to listOf("You sent"),
+            "com.google.android.apps.messaging" to listOf("You")
+        )
+        
+        for ((app, keywords) in commonMessagingApps) {
+            if (packageName.contains(app, ignoreCase = true)) {
+                for (keyword in keywords) {
+                    if (text.contains(keyword, ignoreCase = true)) {
+                        return true
+                    }
+                }
+            }
+        }
+        
+        return false
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
@@ -70,7 +121,8 @@ class NotificationListener : NotificationListenerService() {
         tag: String?,
         priority: Int,
         deviceId: String,
-        deviceName: String
+        deviceName: String,
+        isOutgoing: Boolean
     ) {
         try {
             android.util.Log.d("NotificationListener", "sendToWebhook called with URL: $url")
@@ -92,6 +144,7 @@ class NotificationListener : NotificationListenerService() {
                 put("priority", priority)
                 put("device_id", deviceId)
                 put("device_name", deviceName)
+                put("isOutgoing", isOutgoing)
                 put("timestamp", java.time.Instant.now().toString())
             }
 
