@@ -41,7 +41,7 @@ class NotificationListener : NotificationListenerService() {
         val deviceName = getDeviceName()
 
         val prefs = getSharedPreferences("notification_config", Context.MODE_PRIVATE)
-        val webhookUrl = prefs.getString("webhook_url", "http://10.0.10.125:8082/log")
+        val webhookUrl = prefs.getString("webhook_url", "https://logger.ornette.gr/log")
         
         android.util.Log.d("NotificationListener", "onNotificationPosted called for: $packageName")
         android.util.Log.d("NotificationListener", "webhook_url from SharedPreferences: '$webhookUrl'")
