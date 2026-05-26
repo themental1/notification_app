@@ -53,11 +53,19 @@ android {
 
     signingConfigs {
         release {
-            if (System.getenv("RELEASE_KEYSTORE_PATH") != null) {
-                storeFile file(System.getenv("RELEASE_KEYSTORE_PATH"))
+            // Use release keystore if available, otherwise fall back to debug signing
+            def keystorePath = System.getenv("RELEASE_KEYSTORE_PATH")
+            if (keystorePath != null && new File(keystorePath).exists()) {
+                storeFile file(keystorePath)
                 storePassword System.getenv("KEYSTORE_STOREPASS")
                 keyAlias System.getenv("KEYSTORE_ALIAS")
                 keyPassword System.getenv("KEYSTORE_KEYPASS")
+            } else {
+                // Fall back to debug signing if release keystore is not available
+                storeFile file("${android.signingConfigs.debug.storeFile}")
+                storePassword "${android.signingConfigs.debug.storePassword}"
+                keyAlias "${android.signingConfigs.debug.keyAlias}"
+                keyPassword "${android.signingConfigs.debug.keyPassword}"
             }
         }
     }
