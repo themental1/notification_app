@@ -57,7 +57,7 @@ jobs:
         keytool -genkey -v -keystore android/app/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
 
     - name: Setup release keystore (for release builds)
-      if: secrets.RELEASE_KEYSTORE_BASE64 != ''
+      if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
       run: |
         mkdir -p /home/runner/keystore
         echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > /home/runner/keystore/release.keystore
@@ -68,7 +68,7 @@ jobs:
       run: flutter build apk --debug --verbose 2>&1 | tee build-output.log; exit ${PIPESTATUS[0]}
 
     - name: Build Release APK
-      if: secrets.RELEASE_KEYSTORE_BASE64 != '' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
       env:
         RELEASE_KEYSTORE_PATH: /home/runner/keystore/release.keystore
         KEYSTORE_STOREPASS: ${{ secrets.KEYSTORE_STOREPASS }}
